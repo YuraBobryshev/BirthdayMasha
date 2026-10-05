@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>С днём рождения, любимая!</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#1a1016', 
+                            pink: '#F63B7C', 
+                            card: '#261720', 
+                        }
+                    },
+                    backgroundImage: {
+                        'hero-gradient': 'linear-gradient(180deg, #3d0d22 0%, #1a1016 100%)',
+                        'pink-glow': 'radial-gradient(circle, rgba(246,59,124,0.15) 0%, rgba(26,16,22,0) 70%)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html, body {
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Анимация пульсации сердечка */
+        @keyframes glow {
+            0% { box-shadow: 0 0 20px rgba(246, 59, 124, 0.2); transform: scale(1); }
+            50% { box-shadow: 0 0 40px rgba(246, 59, 124, 0.6); transform: scale(1.02); }
+            100% { box-shadow: 0 0 20px rgba(246, 59, 124, 0.2); transform: scale(1); }
+        }
+        .heart-glow {
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        /* Анимация левитации для AirPods */
+        @keyframes levitate {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        .animate-levitate {
+            animation: levitate 4s ease-in-out infinite;
+        }
+
+        /* Анимация парящих кругов на фоне (боке) */
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.4; }
+            100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+        }
+        .bokeh-circle {
+            position: absolute;
+            background: radial-gradient(circle, rgba(246,59,124,0.4) 0%, rgba(246,59,124,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatUp 15s infinite linear;
+        }
+
+        /* Стилизация ползунка перемотки видео (Range Input) */
+        .seek-bar {
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+        .seek-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #F63B7C;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(246, 59, 124, 0.8);
+            transition: transform 0.1s;
+        }
+        .seek-bar::-webkit-slider-thumb:active {
+            transform: scale(1.2);
+        }
+        .seek-bar::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #F63B7C;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(246, 59, 124, 0.8);
+        }
+
+        /* Тень для имени поверх видео */
+        .name-overlay {
+            background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        /* Кольцо прогресса SVG */
+        .progress-ring {
+            transition: stroke-dashoffset 0.1s linear;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="bg-brand-dark text-white font-sans antialiased selection:bg-brand-pink selection:text-white relative">
+
+    <div id="bokeh-container" class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <!-- Круги боке генерируются через JS для случайного распределения -->
+    </div>
+
+    <section class="bg-hero-gradient min-h-[90vh] flex flex-col items-center justify-center text-center px-4 py-20 relative overflow-hidden z-10">
+        <div class="absolute inset-0 bg-pink-glow pointer-events-none"></div>
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-96 bg-brand-pink/10 blur-[100px] rounded-full pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto relative z-10" data-aos="zoom-in" data-aos-duration="1000">
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight tracking-tight">
+                С днём <br class="md:hidden">
+                <span class="text-brand-pink relative inline-block">
+                    рождения
+                    <svg class="absolute w-full h-3 -bottom-1 left-0 text-brand-pink/50" viewBox="0 0 100 10" preserveAspectRatio="none">
+                        <path d="M0 5 Q 50 10 100 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </span> <br>
+                моя любимая!
+            </h1>
+            <p class="text-lg md:text-xl mb-10 text-gray-300 font-medium max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="300">
+                Сегодня весь мир чуть-чуть ярче, потому что в нём есть ты ✨
+            </p>
+            <div data-aos="fade-up" data-aos-delay="500">
+                <button id="confetti-btn" class="w-full sm:w-auto bg-brand-pink text-white font-bold py-4 px-8 rounded-full transition-transform hover:scale-105 shadow-[0_0_20px_rgba(246,59,124,0.4)] relative z-20">
+                    Открыть поздравление ↓
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="surprise" class="py-20 px-4 relative z-10">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-12">
+            <div class="w-full md:w-1/3 flex justify-center" data-aos="fade-right">
+                <div class="w-48 h-48 md:w-64 md:h-64 rounded-full border border-brand-pink/20 flex items-center justify-center heart-glow bg-brand-dark relative shadow-[inset_0_0_30px_rgba(246,59,124,0.1)]">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-20 h-20 md:w-28 md:h-28 text-brand-pink drop-shadow-[0_0_15px_rgba(246,59,124,0.6)]">
+                        <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="w-full md:w-2/3 text-center md:text-left" data-aos="fade-left">
+                <p class="text-brand-pink font-semibold text-sm tracking-widest uppercase mb-2">От всего сердца</p>
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Это — для тебя.</h2>
+                <p class="text-gray-300 text-lg mb-4 leading-relaxed">
+                    Ты знаешь, как сложно мне говорить красивые слова вслух — поэтому я сделал для тебя этот сайт.
+                </p>
+                <p class="text-gray-300 text-lg leading-relaxed">
+                    Сегодня я хочу, чтобы ты почувствовала ту невероятную, безусловную, настоящую — и только твою! любовь, ради которой хочется жить и творить.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-brand-card text-white py-20 px-4 overflow-hidden rounded-[3rem] mx-2 lg:mx-10 shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-brand-pink/10 relative z-10">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-pink/5 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-5xl mx-auto flex flex-col-reverse md:flex-row items-center gap-12 relative z-10">
+            <div class="w-full md:w-1/2" data-aos="fade-up-right">
+                <h2 class="text-4xl md:text-5xl font-black mb-2">Подожди.</h2>
+                <h2 class="text-4xl md:text-5xl font-black text-brand-pink mb-6">не торопись!</h2>
+                <p class="text-lg mb-8 text-gray-300 font-medium">
+                    Прежде чем продолжить — у тебя кое-что спрятано под подушкой. Распакуй подарок сейчас, надень наушники — потому что дальше тебя ждет сюрприз со звуком!
+                </p>
+                
+                <ul class="space-y-6">
+                    <li class="flex items-center gap-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="w-10 h-10 rounded-full bg-brand-pink text-white flex items-center justify-center font-bold shrink-0 shadow-[0_0_15px_rgba(246,59,124,0.5)]">1</div>
+                        <p class="text-base font-semibold text-gray-200">Распакуй коробку под подушкой</p>
+                    </li>
+                    <li class="flex items-center gap-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="w-10 h-10 rounded-full bg-brand-pink text-white flex items-center justify-center font-bold shrink-0 shadow-[0_0_15px_rgba(246,59,124,0.5)]">2</div>
+                        <p class="text-base font-semibold text-gray-200">Надень наушники и включи звук</p>
+                    </li>
+                    <li class="flex items-center gap-4" data-aos="fade-up" data-aos-delay="300">
+                        <div class="w-10 h-10 rounded-full bg-brand-pink text-white flex items-center justify-center font-bold shrink-0 shadow-[0_0_15px_rgba(246,59,124,0.5)]">3</div>
+                        <p class="text-base font-semibold text-gray-200">Слушай видео ниже, перематывай и листай</p>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="w-full md:w-1/2 flex justify-center" data-aos="zoom-in-left">
+                <div class="w-64 h-64 md:w-96 md:h-96 relative flex items-center justify-center">
+                    <div class="absolute inset-0 bg-brand-pink/20 rounded-full blur-[60px] scale-90"></div>
+                    <img src="pngwing.com (13).jpg" alt="AirPods" class="w-full h-full object-contain mix-blend-screen animate-levitate relative z-10 pointer-events-none">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-24 px-2 overflow-hidden relative z-10">
+        <div class="max-w-5xl mx-auto px-4 text-center mb-10" data-aos="fade-up">
+            <p class="bg-brand-card inline-block py-1 px-4 rounded-full text-brand-pink text-xs font-bold tracking-widest uppercase mb-4 border border-brand-pink/20">Поздравления от близких</p>
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">Все говорят о тебе</h2>
+            <p class="text-gray-400 max-w-lg mx-auto mb-8">Нажми на кружок, чтобы включить или поставить на паузу. Тяни ползунок для перемотки.</p>
+        </div>
+
+        <div class="flex flex-row justify-center items-center gap-2 sm:gap-6 max-w-2xl mx-auto px-2" data-aos="zoom-in">
+            <!-- Левая кнопка Swiper -->
+            <button class="tg-prev w-10 h-10 sm:w-14 sm:h-14 shrink-0 bg-brand-card hover:bg-brand-pink border border-brand-pink/30 text-brand-pink hover:text-white rounded-full flex items-center justify-center transition-all shadow-lg active:scale-95 z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" /></svg>
+            </button>
+
+            <!-- Контейнер слайдера -->
+            <div class="swiper tg-slider w-64 sm:w-80 shrink-0 z-0 !pb-0 !pt-0 relative">
+                <div class="swiper-wrapper w-full">
+                    
+                    <!-- СЛАЙД 1 -->
+                    <div class="swiper-slide w-full flex flex-col items-center">
+                        <div class="relative w-56 h-56 sm:w-72 sm:h-72 video-player-container group">
+                            <!-- SVG Кольцо прогресса -->
+                            <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="56" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
+                                <circle class="progress-ring" cx="60" cy="60" r="56" fill="none" stroke="#F63B7C" stroke-width="4" stroke-dasharray="351.85" stroke-dashoffset="0"></circle>
+                            </svg>
+                            
+                            <!-- Видео -->
+                            <video class="tg-video w-full h-full object-cover rounded-full cursor-pointer border-4 border-transparent shadow-[0_0_30px_rgba(246,59,124,0.2)]" loop muted playsinline src="./video1.mp4"></video>
+                            
+                            <!-- Имя поверх -->
+                            <div class="absolute bottom-0 left-0 w-full pt-10 pb-5 rounded-b-full name-overlay flex justify-center z-10 pointer-events-none opacity-80">
+                                <span class="text-white font-bold text-sm tracking-wide drop-shadow-md">МАМА</span>
+                            </div>
+
+                            <!-- Кнопка Mute -->
+                            <button class="mute-btn absolute bottom-3 right-3 z-20 w-10 h-10 bg-brand-dark/80 rounded-full text-white flex items-center justify-center backdrop-blur-sm border border-brand-pink/30 hover:bg-brand-pink transition-colors shadow-lg">
+                                <!-- Иконка без звука (по умолчанию) -->
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mute-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531V19.69a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.395C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                            </button>
+                            
+                            <!-- Индикатор Play/Pause при клике -->
+                            <div class="play-indicator absolute inset-0 m-auto w-16 h-16 bg-brand-pink/80 rounded-full flex items-center justify-center opacity-0 transform scale-50 transition-all pointer-events-none z-20 backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-white"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        
+                        <!-- Ползунок перемотки -->
+                        <input type="range" class="seek-bar mt-6 w-48 sm:w-60 h-1.5 rounded-lg" value="0" min="0" max="100" step="0.1">
+                    </div>
+
+                    <!-- СЛАЙД 2 -->
+                    <div class="swiper-slide w-full flex flex-col items-center">
+                        <div class="relative w-56 h-56 sm:w-72 sm:h-72 video-player-container group">
+                            <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="56" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
+                                <circle class="progress-ring" cx="60" cy="60" r="56" fill="none" stroke="#F63B7C" stroke-width="4" stroke-dasharray="351.85" stroke-dashoffset="0"></circle>
+                            </svg>
+                            <video class="tg-video w-full h-full object-cover rounded-full cursor-pointer border-4 border-transparent shadow-[0_0_30px_rgba(246,59,124,0.2)]" loop muted playsinline src="./video2.mp4"></video>
+                            <div class="absolute bottom-0 left-0 w-full pt-10 pb-5 rounded-b-full name-overlay flex justify-center z-10 pointer-events-none opacity-80">
+                                <span class="text-white font-bold text-sm tracking-wide drop-shadow-md">ПОДРУГА</span>
+                            </div>
+                            <button class="mute-btn absolute bottom-3 right-3 z-20 w-10 h-10 bg-brand-dark/80 rounded-full text-white flex items-center justify-center backdrop-blur-sm border border-brand-pink/30 hover:bg-brand-pink transition-colors shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mute-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531V19.69a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.395C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                            </button>
+                            <div class="play-indicator absolute inset-0 m-auto w-16 h-16 bg-brand-pink/80 rounded-full flex items-center justify-center opacity-0 transform scale-50 transition-all pointer-events-none z-20 backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-white"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        <input type="range" class="seek-bar mt-6 w-48 sm:w-60 h-1.5 rounded-lg" value="0" min="0" max="100" step="0.1">
+                    </div>
+
+                </div>
+            </div>
+
+             <!-- СЛАЙД 2 -->
+                    <div class="swiper-slide w-full flex flex-col items-center">
+                        <div class="relative w-56 h-56 sm:w-72 sm:h-72 video-player-container group">
+                            <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="56" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
+                                <circle class="progress-ring" cx="60" cy="60" r="56" fill="none" stroke="#F63B7C" stroke-width="4" stroke-dasharray="351.85" stroke-dashoffset="0"></circle>
+                            </svg>
+                            <video class="tg-video w-full h-full object-cover rounded-full cursor-pointer border-4 border-transparent shadow-[0_0_30px_rgba(246,59,124,0.2)]" loop muted playsinline src="./video3.mp4"></video>
+                            <div class="absolute bottom-0 left-0 w-full pt-10 pb-5 rounded-b-full name-overlay flex justify-center z-10 pointer-events-none opacity-80">
+                                <span class="text-white font-bold text-sm tracking-wide drop-shadow-md">ПОДРУГА</span>
+                            </div>
+                            <button class="mute-btn absolute bottom-3 right-3 z-20 w-10 h-10 bg-brand-dark/80 rounded-full text-white flex items-center justify-center backdrop-blur-sm border border-brand-pink/30 hover:bg-brand-pink transition-colors shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mute-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531V19.69a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.395C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                            </button>
+                            <div class="play-indicator absolute inset-0 m-auto w-16 h-16 bg-brand-pink/80 rounded-full flex items-center justify-center opacity-0 transform scale-50 transition-all pointer-events-none z-20 backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-white"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        <input type="range" class="seek-bar mt-6 w-48 sm:w-60 h-1.5 rounded-lg" value="0" min="0" max="100" step="0.1">
+                    </div>
+
+                </div>
+            </div>
+
+             <!-- СЛАЙД 2 -->
+                    <div class="swiper-slide w-full flex flex-col items-center">
+                        <div class="relative w-56 h-56 sm:w-72 sm:h-72 video-player-container group">
+                            <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="56" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
+                                <circle class="progress-ring" cx="60" cy="60" r="56" fill="none" stroke="#F63B7C" stroke-width="4" stroke-dasharray="351.85" stroke-dashoffset="0"></circle>
+                            </svg>
+                            <video class="tg-video w-full h-full object-cover rounded-full cursor-pointer border-4 border-transparent shadow-[0_0_30px_rgba(246,59,124,0.2)]" loop muted playsinline src="./video4.mp4"></video>
+                            <div class="absolute bottom-0 left-0 w-full pt-10 pb-5 rounded-b-full name-overlay flex justify-center z-10 pointer-events-none opacity-80">
+                                <span class="text-white font-bold text-sm tracking-wide drop-shadow-md">ПОДРУГА</span>
+                            </div>
+                            <button class="mute-btn absolute bottom-3 right-3 z-20 w-10 h-10 bg-brand-dark/80 rounded-full text-white flex items-center justify-center backdrop-blur-sm border border-brand-pink/30 hover:bg-brand-pink transition-colors shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mute-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531V19.69a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.395C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                            </button>
+                            <div class="play-indicator absolute inset-0 m-auto w-16 h-16 bg-brand-pink/80 rounded-full flex items-center justify-center opacity-0 transform scale-50 transition-all pointer-events-none z-20 backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-white"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        <input type="range" class="seek-bar mt-6 w-48 sm:w-60 h-1.5 rounded-lg" value="0" min="0" max="100" step="0.1">
+                    </div>
+
+                </div>
+            </div>
+
+             <!-- СЛАЙД 2 -->
+                    <div class="swiper-slide w-full flex flex-col items-center">
+                        <div class="relative w-56 h-56 sm:w-72 sm:h-72 video-player-container group">
+                            <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="56" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
+                                <circle class="progress-ring" cx="60" cy="60" r="56" fill="none" stroke="#F63B7C" stroke-width="4" stroke-dasharray="351.85" stroke-dashoffset="0"></circle>
+                            </svg>
+                            <video class="tg-video w-full h-full object-cover rounded-full cursor-pointer border-4 border-transparent shadow-[0_0_30px_rgba(246,59,124,0.2)]" loop muted playsinline src="./video2.mp4"></video>
+                            <div class="absolute bottom-0 left-0 w-full pt-10 pb-5 rounded-b-full name-overlay flex justify-center z-10 pointer-events-none opacity-80">
+                                <span class="text-white font-bold text-sm tracking-wide drop-shadow-md">ПОДРУГА</span>
+                            </div>
+                            <button class="mute-btn absolute bottom-3 right-3 z-20 w-10 h-10 bg-brand-dark/80 rounded-full text-white flex items-center justify-center backdrop-blur-sm border border-brand-pink/30 hover:bg-brand-pink transition-colors shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mute-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531V19.69a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.395C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                            </button>
+                            <div class="play-indicator absolute inset-0 m-auto w-16 h-16 bg-brand-pink/80 rounded-full flex items-center justify-center opacity-0 transform scale-50 transition-all pointer-events-none z-20 backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-white"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        <input type="range" class="seek-bar mt-6 w-48 sm:w-60 h-1.5 rounded-lg" value="0" min="0" max="100" step="0.1">
+                    </div>
+
+                </div>
+            </div>
+
+             <!-- СЛАЙД 2 -->
+                    <div class="swiper-slide w-full flex flex-col items-center">
+                        <div class="relative w-56 h-56 sm:w-72 sm:h-72 video-player-container group">
+                            <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 120 120">
+                                <circle cx="60" cy="60" r="56" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"></circle>
+                                <circle class="progress-ring" cx="60" cy="60" r="56" fill="none" stroke="#F63B7C" stroke-width="4" stroke-dasharray="351.85" stroke-dashoffset="0"></circle>
+                            </svg>
+                            <video class="tg-video w-full h-full object-cover rounded-full cursor-pointer border-4 border-transparent shadow-[0_0_30px_rgba(246,59,124,0.2)]" loop muted playsinline src="./video2.mp4"></video>
+                            <div class="absolute bottom-0 left-0 w-full pt-10 pb-5 rounded-b-full name-overlay flex justify-center z-10 pointer-events-none opacity-80">
+                                <span class="text-white font-bold text-sm tracking-wide drop-shadow-md">ПОДРУГА</span>
+                            </div>
+                            <button class="mute-btn absolute bottom-3 right-3 z-20 w-10 h-10 bg-brand-dark/80 rounded-full text-white flex items-center justify-center backdrop-blur-sm border border-brand-pink/30 hover:bg-brand-pink transition-colors shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mute-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531V19.69a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.395C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" /></svg>
+                            </button>
+                            <div class="play-indicator absolute inset-0 m-auto w-16 h-16 bg-brand-pink/80 rounded-full flex items-center justify-center opacity-0 transform scale-50 transition-all pointer-events-none z-20 backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-white"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd" /></svg>
+                            </div>
+                        </div>
+                        <input type="range" class="seek-bar mt-6 w-48 sm:w-60 h-1.5 rounded-lg" value="0" min="0" max="100" step="0.1">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Правая кнопка Swiper -->
+            <button class="tg-next w-10 h-10 sm:w-14 sm:h-14 shrink-0 bg-brand-card hover:bg-brand-pink border border-brand-pink/30 text-brand-pink hover:text-white rounded-full flex items-center justify-center transition-all shadow-lg active:scale-95 z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 sm:w-6 sm:h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+            </button>
+        </div>
+    </section>
+
+    <section class="py-20 px-4 relative z-10">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <p class="bg-brand-pink/10 text-brand-pink inline-block py-1 px-4 rounded-full text-xs font-bold tracking-widest uppercase mb-4 border border-brand-pink/20">Вечернее расписание</p>
+                <h2 class="text-4xl md:text-5xl font-black mb-4">Продолжаем вечером</h2>
+                <p class="text-gray-400 max-w-xl mx-auto">Я уже всё придумал... Тебе остаётся только выглядеть превосходно — и довериться мне.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-brand-card rounded-3xl p-8 flex flex-col justify-between shadow-xl relative overflow-hidden" data-aos="fade-up" data-aos-delay="100">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                    <div>
+                        <div class="w-12 h-12 bg-brand-pink/20 rounded-full flex items-center justify-center mb-6 text-brand-pink">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <p class="text-brand-pink text-xs font-bold tracking-widest uppercase mb-2">Начинаем в</p>
+                        <h3 class="text-4xl font-black text-white mb-4">19:00</h3>
+                        <p class="text-gray-400 text-sm">Будь готова к этому времени. Я заеду за тобой!</p>
+                    </div>
+                </div>
+
+                <div class="bg-brand-card rounded-3xl p-8 flex flex-col justify-between shadow-xl relative overflow-hidden" data-aos="fade-up" data-aos-delay="200">
+                     <div class="absolute top-0 right-0 w-32 h-32 bg-brand-pink/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+                    <div>
+                        <div class="w-12 h-12 bg-brand-pink/20 rounded-full flex items-center justify-center mb-6 text-brand-pink">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
+                        </div>
+                        <p class="text-brand-pink text-xs font-bold tracking-widest uppercase mb-2">Место</p>
+                        <h3 class="text-4xl font-black text-white mb-4">СЕКРЕТ</h3>
+                        <p class="text-gray-400 text-sm">Скажу только одно: тебе там точно понравится. Спойлеров не будет.</p>
+                    </div>
+                </div>
+
+                <div class="bg-brand-pink rounded-3xl p-8 flex flex-col justify-between shadow-[0_0_30px_rgba(246,59,124,0.3)] text-white relative overflow-hidden" data-aos="fade-up" data-aos-delay="300">
+                     <div class="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+                    <div>
+                        <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-6 backdrop-blur-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09l2.846.813-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" /></svg>
+                        </div>
+                        <p class="text-white/80 text-xs font-bold tracking-widest uppercase mb-2">Дресс-код</p>
+                        <h3 class="text-3xl font-black mb-4 leading-tight">Будь собой — это лучший наряд</h3>
+                        <p class="text-white/90 text-sm">Надевай то, в чем чувствуешь себя самой красивой и счастливой.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-[#120a0f] py-12 px-4 border-t border-white/5 relative z-10">
+        <div class="max-w-6xl mx-auto flex flex-col items-center gap-2 text-center" data-aos="fade-up">
+            <h2 class="text-3xl font-black text-white mb-1">С днём рождения!</h2>
+            <p class="text-brand-pink font-medium">Твой любимый ❤️</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <script>
+        // 1. Генерация парящего фона (Боке)
+        const bokehContainer = document.getElementById('bokeh-container');
+        const numCircles = 15;
+        for (let i = 0; i < numCircles; i++) {
+            const circle = document.createElement('div');
+            circle.classList.add('bokeh-circle');
+            
+            // Случайные параметры
+            const size = Math.random() * 150 + 50; // От 50 до 200px
+            const left = Math.random() * 100; // От 0 до 100vw
+            const delay = Math.random() * 15; // Задержка от 0 до 15с
+            const duration = Math.random() * 10 + 10; // Длительность от 10 до 20с
+            
+            circle.style.width = `${size}px`;
+            circle.style.height = `${size}px`;
+            circle.style.left = `${left}vw`;
+            circle.style.animationDelay = `${delay}s`;
+            circle.style.animationDuration = `${duration}s`;
+            
+            bokehContainer.appendChild(circle);
+        }
+
+        // 2. Инициализация AOS (анимации при скролле)
+        AOS.init({
+            once: true,
+            offset: 50,
+            duration: 800
+        });
+
+        // 3. Конфетти
+        document.getElementById('confetti-btn').addEventListener('click', function() {
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#F63B7C', '#ffffff', '#ffb6c1', '#ff1493']
+            });
+
+            setTimeout(() => {
+                document.getElementById('surprise').scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }, 600);
+        });
+
+        // 4. Логика кастомного видеоплеера и слайдера
+        const swiper = new Swiper('.tg-slider', {
+            slidesPerView: 1,
+            spaceBetween: 30,
+            effect: 'fade',
+            fadeEffect: { crossFade: true },
+            navigation: {
+                nextEl: '.tg-next',
+                prevEl: '.tg-prev',
+            },
+            on: {
+                // При смене слайда ставим на паузу все видео
+                slideChange: function () {
+                    document.querySelectorAll('.tg-video').forEach(video => {
+                        video.pause();
+                    });
+                }
+            }
+        });
+
+        const circumference = 351.85; // 2 * pi * r (r=56)
+        
+        // Настраиваем каждый видео-слайд
+        document.querySelectorAll('.video-player-container').forEach(container => {
+            const video = container.querySelector('.tg-video');
+            const progressRing = container.querySelector('.progress-ring');
+            const muteBtn = container.querySelector('.mute-btn');
+            const playIndicator = container.querySelector('.play-indicator');
+            const seekBar = container.nextElementSibling; // input type="range"
+
+            // Иконки для кнопки Mute
+            const iconMuted = `<path stroke-linecap="round" stroke-linejoin="round" d="M17.25 9.75L19.5 12m0 0l2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6l4.72-4.72a.75.75 0 011.28.531V19.69a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.506-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.395C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />`;
+            const iconUnmuted = `<path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.353A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />`;
+
+            // Устанавливаем начальное значение кольца
+            progressRing.style.strokeDashoffset = circumference;
+
+            // Обновление прогресса при воспроизведении
+            video.addEventListener('timeupdate', () => {
+                if(video.duration) {
+                    const percent = video.currentTime / video.duration;
+                    
+                    // Обновляем SVG кольцо (уменьшаем его по мере проигрывания)
+                    // Чем больше offset, тем меньше видно линию.
+                    // Начинаем с 0 видимости (offset=circumference) и заливаем кольцо.
+                    // Либо наоборот - кольцо тает. Сделаем так, чтобы кольцо таяло (как в ТГ):
+                    // Начало: offset = 0 (полное кольцо), Конец: offset = circumference (пустое)
+                    progressRing.style.strokeDashoffset = percent * circumference;
+                    
+                    // Обновляем ползунок (если пользователь его не держит)
+                    if (document.activeElement !== seekBar) {
+                        seekBar.value = percent * 100;
+                    }
+                }
+            });
+
+            // Перемотка через ползунок
+            seekBar.addEventListener('input', (e) => {
+                const percent = e.target.value / 100;
+                video.currentTime = percent * video.duration;
+                progressRing.style.strokeDashoffset = percent * circumference;
+            });
+
+            // Клик по видео (Play/Pause)
+            video.addEventListener('click', () => {
+                if (video.paused) {
+                    video.play();
+                    showIndicator(`<path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clip-rule="evenodd" />`);
+                } else {
+                    video.pause();
+                    showIndicator(`<path fill-rule="evenodd" d="M6.75 5.25a.75.75 0 01.75-.75H9a.75.75 0 01.75.75v13.5a.75.75 0 01-.75.75H7.5a.75.75 0 01-.75-.75V5.25zm7.5 0a.75.75 0 01.75-.75h1.5a.75.75 0 01.75.75v13.5a.75.75 0 01-.75.75h-1.5a.75.75 0 01-.75-.75V5.25z" clip-rule="evenodd" />`);
+                }
+            });
+
+            // Клик по кнопке Mute
+            muteBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Чтобы клик не передавался на видео
+                video.muted = !video.muted;
+                muteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">${video.muted ? iconMuted : iconUnmuted}</svg>`;
+                
+                // Если видео на паузе - запускаем при включении звука
+                if(!video.muted && video.paused) {
+                    video.play();
+                }
+            });
+
+            // Функция анимации иконки Play/Pause по центру экрана
+            function showIndicator(svgPath) {
+                playIndicator.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 text-white">${svgPath}</svg>`;
+                playIndicator.style.opacity = '1';
+                playIndicator.style.transform = 'scale(1)';
+                
+                setTimeout(() => {
+                    playIndicator.style.opacity = '0';
+                    playIndicator.style.transform = 'scale(1.5)';
+                }, 500);
+            }
+        });
+    </script>
+</body>
+</html>
